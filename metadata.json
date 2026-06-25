@@ -1,0 +1,6 @@
+{
+  "name": "Portable Blender Store",
+  "description": "Premium e-commerce store for the Portable USB Rechargeable Blender with secure checkout.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
