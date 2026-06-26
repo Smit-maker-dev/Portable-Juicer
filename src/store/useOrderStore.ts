@@ -21,7 +21,7 @@ const MOCK_PRODUCTS = {
   blender: {
     id: "kuaxiblend-portable-usb-blender-380ml",
     name: "KuaxiBlend Portable USB Blender (380ml)",
-    price: 2499,
+    price: 499,
     description: "Our signature professional-grade, cordless personal blender...",
     features: [],
     images: [
@@ -35,7 +35,7 @@ const MOCK_PRODUCTS = {
   sleeve: {
     id: "kuaxishield-neoprene-travel-sleeve",
     name: "KuaxiShield Insulated Neoprene Travel Sleeve",
-    price: 599,
+    price: 429,
     description: "Premium double-insulated neoprene protector sleeve...",
     features: [],
     images: ["https://images.unsplash.com/photo-1517256064527-09c53b2d0bc6?auto=format&fit=crop&q=80&w=600"]
@@ -43,7 +43,7 @@ const MOCK_PRODUCTS = {
   dock: {
     id: "kuaxidock-magnetic-fast-charging-pad",
     name: "KuaxiDock Magnetic Wireless Charging Pad",
-    price: 799,
+    price: 459,
     description: "Elevate your countertop setup...",
     features: [],
     images: ["https://images.unsplash.com/photo-1622445262465-2481c4574875?auto=format&fit=crop&q=80&w=600"]
@@ -60,7 +60,7 @@ const DEFAULT_ORDERS: Order[] = [
         quantity: 1
       }
     ],
-    totalAmount: 2499,
+    totalAmount: 499,
     shippingAddress: {
       fullName: "Smit Vaghasiya",
       phone: "9988776655",
@@ -97,7 +97,7 @@ const DEFAULT_ORDERS: Order[] = [
         quantity: 1
       }
     ],
-    totalAmount: 1398,
+    totalAmount: 888,
     shippingAddress: {
       fullName: "Smit Vaghasiya",
       phone: "9988776655",

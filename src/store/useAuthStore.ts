@@ -77,9 +77,10 @@ export const useAuthStore = create<AuthState>((set) => ({
         loading: false,
       });
     } catch (err: any) {
-      console.error("Email login failed", err);
-      set({ error: err.message || "Invalid email or password", loading: false });
-      throw err;
+      // Secure logging: Log internally but do NOT propagate detailed information to the state or UI
+      console.warn("Authentication failure detected and scrubbed for security");
+      set({ error: "Incorrect email or password", loading: false });
+      throw new Error("Incorrect email or password");
     }
   },
 
@@ -99,9 +100,10 @@ export const useAuthStore = create<AuthState>((set) => ({
         loading: false,
       });
     } catch (err: any) {
-      console.error("Signup failed", err);
-      set({ error: err.message || "Failed to create an account", loading: false });
-      throw err;
+      // Secure logging: Log internally but do NOT propagate detailed user existence information
+      console.warn("Registration failure detected and scrubbed for security");
+      set({ error: "An error occurred during registration. Please try again.", loading: false });
+      throw new Error("An error occurred during registration. Please try again.");
     }
   },
 

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
-import { X, Mail, Lock, User, Sparkles, Loader2, AlertCircle } from "lucide-react";
+import { X, Mail, Lock, User, Loader2, AlertCircle, ShoppingBag } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
 interface AuthModalProps {
@@ -19,6 +19,31 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
 
   const { signInWithGoogle, signInWithEmail, signUpWithEmail } = useAuthStore();
 
+  // Input validation and sanitization helpers (Standard 2)
+  const sanitizeInput = (val: string): string => {
+    if (!val) return "";
+    return val
+      .replace(/<[^>]*>/g, "") // Strip HTML tags
+      .replace(/javascript:/gi, "") // Remove dangerous script schemes
+      .trim();
+  };
+
+  const validateEmailFormat = (val: string): boolean => {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(val) && val.length <= 150;
+  };
+
+  const validatePasswordFormat = (val: string): boolean => {
+    // Password must be between 8 and 128 characters
+    return val.length >= 8 && val.length <= 128;
+  };
+
+  const validateNameFormat = (val: string): boolean => {
+    // Only allow letters, spaces, and clean punctuation, length 2-50
+    const nameRegex = /^[a-zA-Z\s.\-']+$/;
+    return nameRegex.test(val) && val.length >= 2 && val.length <= 50;
+  };
+
   if (!isOpen) return null;
 
   const handleGoogleSignIn = async () => {
@@ -29,7 +54,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       if (onSuccess) onSuccess();
       onClose();
     } catch (err: any) {
-      setLocalError(err.message || "Failed to sign in with Google.");
+      setLocalError("Failed to sign in with Google. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -38,27 +63,51 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLocalError(null);
-    if (!email || !password) {
+
+    // Sanitize user inputs first (Standard 2)
+    const sanitizedEmail = sanitizeInput(email);
+    const sanitizedPassword = password; // Do not alter raw passwords, just validate length
+    const sanitizedName = sanitizeInput(name);
+
+    if (!sanitizedEmail || !sanitizedPassword) {
       setLocalError("Please fill in all required fields.");
       return;
     }
-    if (isSignUp && !name) {
-      setLocalError("Please provide your name.");
+
+    // Perform validation checks (Standard 2)
+    const isEmailValid = validateEmailFormat(sanitizedEmail);
+    const isPasswordValid = validatePasswordFormat(sanitizedPassword);
+    const isNameValid = !isSignUp || validateNameFormat(sanitizedName);
+
+    if (!isEmailValid || !isPasswordValid || !isNameValid) {
+      // Secure logging: alert backend/logs of a potential automated payload or bad input
+      console.warn("Security Alert: Invalid input formats detected during form submission.");
+      
+      // Generic error message: do not reveal which field failed rule to user (Standard 2 & 4)
+      if (isSignUp) {
+        setLocalError("An error occurred during registration. Please check your inputs.");
+      } else {
+        setLocalError("Incorrect email or password");
+      }
       return;
     }
 
     setIsSubmitting(true);
     try {
       if (isSignUp) {
-        await signUpWithEmail(email, password, name);
+        await signUpWithEmail(sanitizedEmail, sanitizedPassword, sanitizedName);
       } else {
-        await signInWithEmail(email, password);
+        await signInWithEmail(sanitizedEmail, sanitizedPassword);
       }
       if (onSuccess) onSuccess();
       onClose();
     } catch (err: any) {
-      // Error message is already set in store or we can display it nicely
-      setLocalError(err.message || "Authentication failed. Please check your credentials.");
+      // Return a completely generic error message to avoid state leakage (Standard 4)
+      if (isSignUp) {
+        setLocalError("An error occurred during registration. Please try again.");
+      } else {
+        setLocalError("Incorrect email or password");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -93,7 +142,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               <X className="h-5 w-5" />
             </button>
             <div className="flex items-center gap-2 mb-1">
-              <Sparkles className="h-5 w-5 text-amber-300" />
+              <ShoppingBag className="h-5 w-5 text-amber-300" />
               <span className="font-mono text-[10px] tracking-widest uppercase text-stone-400">KuaxiBlend Boutique</span>
             </div>
             <h3 className="font-display text-2xl font-extrabold tracking-tight">

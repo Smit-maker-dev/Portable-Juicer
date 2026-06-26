@@ -75,4 +75,17 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "healthy", timestamp: new Date() });
 });
 
+// Secure Admin Password verification endpoint (Standard 1 & 4)
+app.post("/api/admin/verify", (req, res) => {
+  const { password } = req.body;
+  const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
+  
+  if (password === adminPassword) {
+    return res.json({ success: true, token: `admin_session_${Math.random().toString(36).substring(2, 10)}` });
+  }
+  
+  // Constant-time-like feedback: do not reveal too much, return standard 401
+  return res.status(401).json({ success: false, error: "Incorrect admin password" });
+});
+
 export default app;

@@ -9,7 +9,7 @@ import { useOrderStore } from "../store/useOrderStore";
 import { 
   X, MapPin, Truck, CreditCard, ShieldCheck, Check, 
   ArrowRight, ShoppingBag, ChevronRight, Lock, Printer, 
-  Sparkles, CheckCircle2, AlertCircle, RefreshCw 
+  CheckCircle2, AlertCircle, RefreshCw 
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -730,7 +730,7 @@ export default function CheckoutFlow({ isOpen, onClose }: CheckoutFlowProps) {
                         <p className="text-sm font-mono text-stone-600 truncate">{paymentId}</p>
                       </div>
                       <div className="sm:col-span-2 border-t border-stone-100 pt-3">
-                        <p className="text-[10px] font-mono text-stone-400 uppercase font-semibold">Guaranteed Delivery Date:</p>
+                        <p className="text-[10px] font-mono text-stone-400 uppercase font-semibold">Estimated Delivery Date:</p>
                         <p className="text-sm font-sans font-bold text-emerald-700 flex items-center gap-1.5 mt-0.5">
                           🚚 {estimatedDelivery}
                         </p>
@@ -823,11 +823,6 @@ export default function CheckoutFlow({ isOpen, onClose }: CheckoutFlowProps) {
                       <span className="font-display">Grand Total:</span>
                       <span className="font-mono text-base text-stone-950">₹{getGrandTotal().toLocaleString("en-IN")}</span>
                     </div>
-                  </div>
-
-                  <div className="p-3 bg-stone-100 rounded-xl text-[10px] text-stone-500 leading-normal font-sans border border-stone-200/50 space-y-1">
-                    <p className="font-semibold text-stone-700">🔒 Trust Protection Guarantee</p>
-                    <p>All items carry a 1-year hardware replacement warranty directly under written invoice parameters.</p>
                   </div>
                 </div>
               </div>

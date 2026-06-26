@@ -8,6 +8,7 @@ import { useCartStore } from "./store/useCartStore";
 import CartSidebar from "./components/CartSidebar";
 import CheckoutFlow from "./components/CheckoutFlow";
 import OrdersView from "./components/OrdersView";
+import AdminDashboard from "./components/AdminDashboard";
 import { Product } from "./types";
 import { 
   ShoppingBag, 
@@ -16,7 +17,6 @@ import {
   Battery, 
   Zap, 
   ShieldCheck, 
-  Sparkles, 
   Info, 
   RotateCcw,
   Star,
@@ -27,17 +27,21 @@ import {
   Search,
   ChevronDown,
   User,
-  LogOut
+  LogOut,
+  Share2,
+  Sliders
 } from "lucide-react";
 import { gsap } from "gsap";
 import { useAuthStore } from "./store/useAuthStore";
 import AuthModal from "./components/AuthModal";
+import AskExpertChat from "./components/AskExpertChat";
+import ScrollToTop from "./components/ScrollToTop";
 
 // Product definition matching types/index.ts
 const PREMIUM_BLENDER: Product = {
   id: "kuaxiblend-portable-usb-blender-380ml",
   name: "KuaxiBlend Portable USB Blender",
-  price: 2499, // ₹2,499
+  price: 499, // ₹499
   description: "A high-quality, cordless personal blender designed for active lifestyles. Made with safe, BPA-free food-grade plastic, strong rechargeable batteries, and six sharp stainless steel blades, it blends frozen fruits and fresh vegetables into smooth drinks in just 20 seconds.",
   features: [
     "380ml Bottle Capacity",
@@ -70,7 +74,7 @@ export const PRODUCTS_CATALOG: Product[] = [
   {
     id: "kuaxiblend-portable-usb-blender-380ml",
     name: "KuaxiBlend Portable USB Blender (380ml)",
-    price: 2499,
+    price: 499,
     description: "Our signature cordless personal blender. Made with durable, safe BPA-free plastic, rechargeable batteries, and six sharp stainless steel blades. Easily blends frozen berries and shakes in 20 seconds.",
     features: [
       "380ml capacity with a leakproof lid for drinking directly",
@@ -90,7 +94,7 @@ export const PRODUCTS_CATALOG: Product[] = [
   {
     id: "kuaxiblend-pro-max-500ml",
     name: "KuaxiBlend Pro Max Cordless Blender (500ml)",
-    price: 3199,
+    price: 539,
     description: "A larger and more powerful cordless blender. Features an upgraded 8-leaf blade, a fast 24,000 RPM motor, and a clear LED screen showing battery percentage and blending time.",
     features: [
       "Extra-large 500ml capacity safe plastic bottle",
@@ -110,7 +114,7 @@ export const PRODUCTS_CATALOG: Product[] = [
   {
     id: "kuaxishield-neoprene-travel-sleeve",
     name: "KuaxiShield Insulated Neoprene Travel Sleeve",
-    price: 599,
+    price: 429,
     description: "Insulated protective cover designed for KuaxiBlend 380ml and 500ml blenders. Keeps your drinks cold for up to 6 hours and protects the bottle from accidental drops, dents, and scratches.",
     features: [
       "Thick, shockproof protective material",
@@ -129,7 +133,7 @@ export const PRODUCTS_CATALOG: Product[] = [
   {
     id: "kuaxidock-magnetic-fast-charging-pad",
     name: "KuaxiDock Magnetic Wireless Charging Pad",
-    price: 799,
+    price: 459,
     description: "The perfect addition to your kitchen counter. Strong magnets align your blender perfectly on the pad for fast, wireless charging with clear light indicators.",
     features: [
       "Easy magnetic alignment for charging",
@@ -148,7 +152,7 @@ export const PRODUCTS_CATALOG: Product[] = [
   {
     id: "kuaxipack-replacement-jar-blade-set",
     name: "KuaxiPack Spare Jar & Surgical Blade Kit",
-    price: 899,
+    price: 489,
     description: "A complete spare bottle set. Includes a secondary BPA-free plastic jar and a fresh set of stainless steel blades so you can keep blending while your other set is washing.",
     features: [
       "Clear 380ml safe plastic bottle",
@@ -167,7 +171,7 @@ export const PRODUCTS_CATALOG: Product[] = [
   {
     id: "kuaxipulse-protein-powder-storage-cap",
     name: "KuaxiPulse Modular Dry Powder Storage Cap",
-    price: 349,
+    price: 449,
     description: "A handy screw-on lid compartment that holds up to 60g of protein powder or oats dry. Release them into the bottle with a simple twist whenever you are ready to blend.",
     features: [
       "Airtight compartment holds up to 60g of dry powder",
@@ -189,47 +193,47 @@ export const PRODUCT_METADATA: Record<string, AmazonProductDetails> = {
   "kuaxiblend-portable-usb-blender-380ml": {
     rating: 4.8,
     ratingCount: 342,
-    originalPrice: 3999,
+    originalPrice: 799,
     stockLeft: 8,
     isBestSeller: true,
-    couponText: "Save ₹150 with coupon",
+    couponText: "Save ₹30 with coupon",
     deliveryDays: 2
   },
   "kuaxiblend-pro-max-500ml": {
     rating: 4.9,
     ratingCount: 118,
-    originalPrice: 4999,
+    originalPrice: 849,
     stockLeft: 4,
     isAmazonChoice: true,
-    couponText: "Save ₹200 with coupon",
+    couponText: "Save ₹40 with coupon",
     deliveryDays: 2
   },
   "kuaxishield-neoprene-travel-sleeve": {
     rating: 4.6,
     ratingCount: 89,
-    originalPrice: 999,
+    originalPrice: 699,
     stockLeft: 15,
     deliveryDays: 3
   },
   "kuaxidock-magnetic-fast-charging-pad": {
     rating: 4.7,
     ratingCount: 65,
-    originalPrice: 1499,
+    originalPrice: 749,
     stockLeft: 12,
-    couponText: "Save ₹50 with coupon",
+    couponText: "Save ₹20 with coupon",
     deliveryDays: 3
   },
   "kuaxipack-replacement-jar-blade-set": {
     rating: 4.5,
     ratingCount: 42,
-    originalPrice: 1599,
+    originalPrice: 799,
     stockLeft: 6,
     deliveryDays: 4
   },
   "kuaxipulse-protein-powder-storage-cap": {
     rating: 4.4,
     ratingCount: 76,
-    originalPrice: 699,
+    originalPrice: 729,
     stockLeft: 22,
     deliveryDays: 4
   }
@@ -272,9 +276,19 @@ const FAQ_ITEMS = [
 ];
 
 export default function App() {
+  const [products, setProducts] = useState<Product[]>(() => {
+    const saved = localStorage.getItem("kuaxiblend_admin_products");
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {}
+    }
+    return PRODUCTS_CATALOG;
+  });
+
   const [cartOpen, setCartOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
-  const [currentView, setCurrentView] = useState<"store" | "orders">("store");
+  const [currentView, setCurrentView] = useState<"store" | "orders" | "admin">("store");
   const [heroActiveImage, setHeroActiveImage] = useState(PREMIUM_BLENDER.images[0]);
   const [selectedColor, setSelectedColor] = useState(COLOR_PRESETS[0]);
   const [blendSpeed, setBlendSpeed] = useState<"off" | "low" | "high" | "turbo">("off");
@@ -288,8 +302,59 @@ export default function App() {
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [pendingCheckout, setPendingCheckout] = useState(false);
+  const [shareToast, setShareToast] = useState<string | null>(null);
 
   const { user, logout } = useAuthStore();
+
+  // Check URL search params for deep linking to products, and route check for secret admin path
+  useEffect(() => {
+    if (window.location.pathname === "/admin" || window.location.pathname === "/admin/login") {
+      setCurrentView("admin");
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const productId = params.get("product");
+    if (productId) {
+      const foundProduct = products.find(p => p.id === productId);
+      if (foundProduct) {
+        setSelectedProductForModal(foundProduct);
+      }
+    }
+  }, [products]);
+
+  const handleShareProduct = async (product: Product) => {
+    const shareUrl = `${window.location.origin}${window.location.pathname}?product=${encodeURIComponent(product.id)}`;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: product.name,
+          text: `Check out the ${product.name} on KuaxiBlend Boutique!`,
+          url: shareUrl,
+        });
+        setShareToast("Shared successfully!");
+        setTimeout(() => setShareToast(null), 2500);
+      } catch (error) {
+        if (error instanceof Error && error.name !== "AbortError") {
+          copyToClipboard(shareUrl);
+        }
+      }
+    } else {
+      copyToClipboard(shareUrl);
+    }
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        setShareToast("Product link copied to clipboard!");
+        setTimeout(() => setShareToast(null), 2500);
+      })
+      .catch(() => {
+        setShareToast("Failed to copy link. Please copy the URL.");
+        setTimeout(() => setShareToast(null), 3000);
+      });
+  };
 
   useEffect(() => {
     if (selectedProductForModal) {
@@ -402,8 +467,16 @@ export default function App() {
       {/* Toast Notification for Adding to Cart */}
       {isAddedNotify && (
         <div id="cart-add-toast" className="fixed top-24 right-6 z-50 bg-stone-900 text-stone-100 px-5 py-3.5 rounded-xl shadow-lg flex items-center gap-3 text-sm font-medium animate-bounce border border-stone-800">
-          <Sparkles className="h-4 w-4 text-amber-400" />
+          <Check className="h-4 w-4 text-emerald-400" />
           <span>Added to cart successfully!</span>
+        </div>
+      )}
+
+      {/* Toast Notification for Sharing */}
+      {shareToast && (
+        <div id="share-toast" className="fixed top-24 right-6 z-50 bg-stone-900 text-stone-100 px-5 py-3.5 rounded-xl shadow-lg flex items-center gap-3 text-sm font-medium animate-bounce border border-stone-800">
+          <Share2 className="h-4 w-4 text-amber-400" />
+          <span>{shareToast}</span>
         </div>
       )}
 
@@ -434,13 +507,13 @@ export default function App() {
           </nav>
 
           {/* Cart & Orders Triggers */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2">
             <button
               id="header-orders-btn"
               onClick={() => setCurrentView(currentView === "orders" ? "store" : "orders")}
               className={`relative py-2 px-3 sm:py-2.5 sm:px-4 rounded-full border transition-all cursor-pointer flex items-center gap-1.5 active:scale-95 text-xs font-display font-medium ${
                 currentView === "orders"
-                  ? "bg-stone-950 text-stone-50 border-stone-950 shadow-sm"
+                  ? "bg-stone-950 text-stone-50 border-stone-950 shadow-xs"
                   : "border-stone-200 bg-stone-100/50 hover:bg-stone-200/50 text-stone-800"
               }`}
             >
@@ -491,7 +564,19 @@ export default function App() {
         </div>
       </header>
 
-      {currentView === "orders" ? (
+      {currentView === "admin" ? (
+        <AdminDashboard 
+          onBackToShop={() => {
+            setCurrentView("store");
+            if (window.location.pathname === "/admin" || window.location.pathname === "/admin/login") {
+              window.history.pushState({}, "", "/");
+            }
+          }} 
+          onProductsChange={(updatedProducts) => {
+            setProducts(updatedProducts);
+          }}
+        />
+      ) : currentView === "orders" ? (
         <OrdersView 
           onBackToShop={() => setCurrentView("store")} 
           onProductClick={(prod) => setSelectedProductForModal(prod)}
@@ -527,11 +612,11 @@ export default function App() {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-2xl sm:text-3xl font-extrabold text-stone-950">₹2,499</span>
-                    <span className="text-sm line-through text-stone-400 font-mono">₹3,999</span>
+                    <span className="font-mono text-2xl sm:text-3xl font-extrabold text-stone-950">₹499</span>
+                    <span className="text-sm line-through text-stone-400 font-mono">₹799</span>
                     <span className="text-xs bg-emerald-100 text-emerald-800 font-mono font-medium px-2 py-0.5 rounded">37% OFF</span>
                   </div>
-                  <p className="text-xs text-stone-500 font-sans">Includes 2-Year warranty • Free India Shipping</p>
+                  <p className="text-xs text-stone-500 font-sans">Free India Shipping</p>
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-2.5 shrink-0">
@@ -558,9 +643,6 @@ export default function App() {
             <div className="hero-trust-badges flex flex-wrap gap-x-8 gap-y-4 pt-2 text-stone-500 text-xs font-mono">
               <span className="flex items-center gap-1.5">
                 <Truck className="h-4 w-4 text-stone-400" /> Free Shipping Across India
-              </span>
-              <span className="flex items-center gap-1.5">
-                <ShieldCheck className="h-4 w-4 text-stone-400" /> 2-Year Safety Warranty
               </span>
               <span className="flex items-center gap-1.5">
                 <Zap className="h-4 w-4 text-stone-400" /> High-Speed 22k RPM Motor
@@ -632,7 +714,7 @@ export default function App() {
           </div>
 
           {(() => {
-            const filteredProducts = PRODUCTS_CATALOG.filter((product) => {
+            const filteredProducts = products.filter((product) => {
               // Search Query Filter
               if (searchQuery.trim() !== "") {
                 const q = searchQuery.toLowerCase();
@@ -687,6 +769,18 @@ export default function App() {
                           className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500"
                           referrerPolicy="no-referrer"
                         />
+
+                        {/* Share Button using Web Share API */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleShareProduct(product);
+                          }}
+                          className="absolute top-3 right-3 p-2 bg-white/95 hover:bg-white text-stone-700 hover:text-stone-950 rounded-full shadow-md border border-stone-200/60 backdrop-blur-xs transition-all hover:scale-110 active:scale-95 cursor-pointer flex items-center justify-center z-10"
+                          title="Share Product"
+                        >
+                          <Share2 className="h-3.5 w-3.5" />
+                        </button>
 
                         {/* Amazon style Best Seller / Amazon choice badges */}
                         <div className="absolute top-3 left-3 flex flex-col gap-1.5">
@@ -1164,7 +1258,7 @@ export default function App() {
 
       {/* Trust & Policy Info */}
       <section className="py-12 bg-stone-100/40 text-stone-500 border-b border-stone-200/60">
-        <div className="max-w-4xl mx-auto px-6 grid grid-cols-2 sm:grid-cols-4 gap-6 text-center text-xs font-mono uppercase tracking-wider">
+        <div className="max-w-4xl mx-auto px-6 grid grid-cols-1 sm:grid-cols-3 gap-6 text-center text-xs font-mono uppercase tracking-wider">
           <div className="space-y-2">
             <Lock className="h-5 w-5 text-stone-400 mx-auto" />
             <p className="text-stone-800 font-medium">Safe Checkout</p>
@@ -1174,11 +1268,6 @@ export default function App() {
             <Truck className="h-5 w-5 text-stone-400 mx-auto" />
             <p className="text-stone-800 font-medium">Free Delivery</p>
             <p className="text-[10px] text-stone-400 lowercase">Every pincode in India</p>
-          </div>
-          <div className="space-y-2">
-            <ShieldCheck className="h-5 w-5 text-stone-400 mx-auto" />
-            <p className="text-stone-800 font-medium">2-Year Cover</p>
-            <p className="text-[10px] text-stone-400 lowercase">Full engine replacement</p>
           </div>
           <div className="space-y-2">
             <Check className="h-5 w-5 text-stone-400 mx-auto" />
@@ -1253,7 +1342,7 @@ export default function App() {
             </div>
             <div>
               <p className="font-display font-semibold text-stone-950 text-xs truncate max-w-[120px]">KuaxiBlend V1</p>
-              <p className="font-mono text-stone-600 font-bold text-xs">₹2,499</p>
+              <p className="font-mono text-stone-600 font-bold text-xs">₹499</p>
             </div>
           </div>
           
@@ -1286,12 +1375,21 @@ export default function App() {
               <span className="text-xs font-mono text-stone-500 font-semibold tracking-wide flex items-center gap-1.5">
                 <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" /> KuaxiBlend Store • Official Amazon Listing Detail
               </span>
-              <button
-                onClick={() => setSelectedProductForModal(null)}
-                className="p-1 text-stone-500 hover:text-stone-900 rounded-lg hover:bg-stone-200/50 transition-colors cursor-pointer text-sm font-mono"
-              >
-                ✕ Close
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => handleShareProduct(selectedProductForModal)}
+                  className="px-2.5 py-1 text-xs font-display font-medium text-stone-600 hover:text-stone-900 border border-stone-300 rounded-lg bg-white hover:bg-stone-50 transition-colors flex items-center gap-1.5 cursor-pointer"
+                  title="Share product link"
+                >
+                  <Share2 className="h-3.5 w-3.5 text-stone-500" /> Share
+                </button>
+                <button
+                  onClick={() => setSelectedProductForModal(null)}
+                  className="p-1 text-stone-500 hover:text-stone-900 rounded-lg hover:bg-stone-200/50 transition-colors cursor-pointer text-sm font-mono"
+                >
+                  ✕ Close
+                </button>
+              </div>
             </div>
 
             {/* Modal Body */}
@@ -1511,6 +1609,12 @@ export default function App() {
 
         </div>
       )}
+
+      {/* Ask an Expert Floating Chat System */}
+      <AskExpertChat />
+
+      {/* Floating Scroll-To-Top button */}
+      <ScrollToTop />
 
     </div>
   );

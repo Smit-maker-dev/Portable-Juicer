@@ -48,7 +48,7 @@ export interface Order {
   shippingAddress: ShippingAddress;
   shippingMethod: "standard" | "express" | "same-day";
   paymentMethod: "razorpay" | "cod" | "upi";
-  status: "placed" | "preparing" | "dispatched" | "delivered";
+  status: "placed" | "preparing" | "ready_to_ship" | "dispatched" | "delivered";
   deliveryDate: string;
   paymentId?: string;
 }
