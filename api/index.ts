@@ -78,7 +78,7 @@ app.get("/api/health", (req, res) => {
 // Secure Admin Password verification endpoint (Standard 1 & 4)
 app.post("/api/admin/verify", (req, res) => {
   const { password } = req.body;
-  const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
+  const adminPassword = process.env.ADMIN_PASSWORD || "Krushna@6356";
   
   if (password === adminPassword) {
     return res.json({ success: true, token: `admin_session_${Math.random().toString(36).substring(2, 10)}` });

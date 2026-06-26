@@ -424,7 +424,7 @@ export default function AdminDashboard({ onBackToShop, onProductsChange }: Admin
               Back to Storefront View
             </button>
             <div className="mt-4 bg-amber-50/70 border border-amber-200/50 rounded-xl p-3 text-[11px] text-amber-800 text-left">
-              <strong>Tip for testers:</strong> The default secure password is <code className="bg-amber-100 px-1 py-0.5 rounded font-bold font-mono">admin123</code>. You can configure this custom key in your <code className="font-mono">.env.example</code> file.
+              <strong>Tip for testers:</strong> The default secure password is <code className="bg-amber-100 px-1 py-0.5 rounded font-bold font-mono">Krushna@6356</code>. You can configure this custom key in your <code className="font-mono">.env.example</code> file.
             </div>
           </div>
         </div>
@@ -1279,7 +1279,7 @@ export default function AdminDashboard({ onBackToShop, onProductsChange }: Admin
                     ADMIN_PASSWORD="MySuperSecureEnterprisePassword99#"
                   </pre>
                   <p className="text-[10px] text-amber-800 font-sans mt-2 bg-amber-50 border border-amber-200/50 p-2.5 rounded-lg leading-relaxed">
-                    <strong>Notice:</strong> The backend server lazy initializes configurations and will fallback to default <code className="bg-amber-100 px-1 font-mono font-bold">admin123</code> if no other keys are set, enabling immediate testing inside the safe sandboxed container preview.
+                    <strong>Notice:</strong> The backend server lazy initializes configurations and will fallback to default <code className="bg-amber-100 px-1 font-mono font-bold">Krushna@6356</code> if no other keys are set, enabling immediate testing inside the safe sandboxed container preview.
                   </p>
                 </div>
               </div>

@@ -54,7 +54,14 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       if (onSuccess) onSuccess();
       onClose();
     } catch (err: any) {
-      setLocalError("Failed to sign in with Google. Please try again.");
+      console.error("Auth Modal Google Sign-in Error:", err);
+      if (err.code === "auth/unauthorized-domain") {
+        setLocalError("Unauthorized Domain: Please add this URL to 'Authorized Domains' in your Firebase Console settings.");
+      } else if (err.code === "auth/popup-blocked") {
+        setLocalError("Popup Blocked: Please allow popups in your browser settings to sign in with Google.");
+      } else {
+        setLocalError("Failed to sign in with Google. Please check your connection and try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }

@@ -57,7 +57,17 @@ export const useAuthStore = create<AuthState>((set) => ({
       });
     } catch (err: any) {
       console.error("Google login failed", err);
-      set({ error: err.message || "Failed to log in with Google", loading: false });
+      let friendlyMessage = "Failed to log in with Google";
+      
+      if (err.code === "auth/unauthorized-domain") {
+        friendlyMessage = "This domain is not authorized for Google Sign-in. Please add your Vercel URL to Authorized Domains in the Firebase Console.";
+      } else if (err.code === "auth/popup-blocked") {
+        friendlyMessage = "The sign-in popup was blocked by your browser. Please allow popups for this site.";
+      } else if (err.code === "auth/cancelled-popup-request") {
+        friendlyMessage = "Sign-in was cancelled. Please try again.";
+      }
+      
+      set({ error: friendlyMessage, loading: false });
       throw err;
     }
   },
