@@ -1,0 +1,98 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 1. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // 2. Helper primitives
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // 3. Validation helper for Orders
+    function isValidOrder(data) {
+      return data.keys().hasAll(['id', 'userId', 'date', 'items', 'totalAmount', 'shippingAddress', 'shippingMethod', 'paymentMethod', 'status', 'deliveryDate']) 
+        && data.keys().size() <= 12
+        && data.id is string && data.id.size() <= 64
+        && data.userId is string && data.userId == request.auth.uid
+        && data.totalAmount is number && data.totalAmount >= 0
+        && data.items is list && data.items.size() <= 50
+        && data.shippingAddress is map
+        && data.shippingMethod is string && data.shippingMethod in ['standard', 'express', 'same-day']
+        && data.paymentMethod is string && data.paymentMethod in ['razorpay', 'cod', 'upi']
+        && data.status is string && data.status in ['placed', 'preparing', 'ready_to_ship', 'dispatched', 'delivered']
+        && data.deliveryDate is string && data.deliveryDate.size() <= 100
+        && data.date is string && data.date.size() <= 100;
+    }
+
+    // 4. Validation helper for Reviews
+    function isValidReview(data) {
+      return data.keys().hasAll(['id', 'productId', 'orderId', 'userId', 'rating', 'comment', 'date', 'userName']) 
+        && data.keys().size() == 8
+        && data.id is string && data.id.size() <= 64
+        && data.productId is string && data.productId.size() <= 128
+        && data.orderId is string && data.orderId.size() <= 128
+        && data.userId is string && data.userId == request.auth.uid
+        && data.rating is number && data.rating >= 1 && data.rating <= 5
+        && data.comment is string && data.comment.size() <= 5000
+        && data.date is string && data.date.size() <= 100
+        && data.userName is string && data.userName.size() <= 100;
+    }
+
+    // 5. Orders Collection Rules
+    match /orders/{orderId} {
+      allow create: if isSignedIn() && isValidId(orderId) && isValidOrder(incoming());
+      
+      // Get/List access is strictly locked down to the owner of the order to prevent data leaks.
+      allow get: if isSignedIn() && existing().userId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      
+      // Allow user to simulate status progression
+      allow update: if isSignedIn() 
+        && existing().userId == request.auth.uid 
+        && incoming().userId == existing().userId
+        && incoming().diff(existing()).affectedKeys().hasOnly(['status'])
+        && incoming().status in ['placed', 'preparing', 'ready_to_ship', 'dispatched', 'delivered'];
+
+      allow delete: if false; // Orders cannot be deleted to preserve records.
+    }
+
+    // 6. Reviews Collection Rules
+    match /reviews/{reviewId} {
+      // Anyone can read reviews for social proof.
+      allow read: if true;
+      
+      // Authenticated users can create reviews on valid purchase ids.
+      allow create: if isSignedIn() && isValidId(reviewId) && isValidReview(incoming());
+      
+      // Owner can update their reviews or delete them.
+      allow update: if isSignedIn() 
+        && existing().userId == request.auth.uid
+        && incoming().userId == existing().userId
+        && isValidReview(incoming())
+        && incoming().diff(existing()).affectedKeys().hasAny(['rating', 'comment', 'date', 'userName']);
+        
+      allow delete: if isSignedIn() && existing().userId == request.auth.uid;
+    }
+
+  }
+}

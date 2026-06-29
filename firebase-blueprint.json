@@ -1,0 +1,107 @@
+{
+  "entities": {
+    "Order": {
+      "title": "Order",
+      "description": "An order placed by a user",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique Order ID"
+        },
+        "userId": {
+          "type": "string",
+          "description": "The UID of the user who placed this order"
+        },
+        "date": {
+          "type": "string",
+          "description": "ISO date string when the order was placed"
+        },
+        "items": {
+          "type": "array",
+          "description": "List of ordered items with product and quantity details"
+        },
+        "totalAmount": {
+          "type": "number",
+          "description": "Total checkout amount in INR"
+        },
+        "shippingAddress": {
+          "type": "object",
+          "description": "Address details of where the order should be shipped"
+        },
+        "shippingMethod": {
+          "type": "string",
+          "description": "Type of delivery selected (standard, express, or same-day)"
+        },
+        "paymentMethod": {
+          "type": "string",
+          "description": "Selected payment method (razorpay, cod, or upi)"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["placed", "preparing", "ready_to_ship", "dispatched", "delivered"],
+          "description": "Current fulfillment status of this order"
+        },
+        "deliveryDate": {
+          "type": "string",
+          "description": "Calculated estimated delivery window text"
+        },
+        "paymentId": {
+          "type": "string",
+          "description": "Successful reference gateway transaction ID"
+        }
+      },
+      "required": ["id", "userId", "date", "items", "totalAmount", "shippingAddress", "shippingMethod", "paymentMethod", "status", "deliveryDate"]
+    },
+    "ProductReview": {
+      "title": "ProductReview",
+      "description": "A customer rating and feedback comment for a product",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique review ID"
+        },
+        "productId": {
+          "type": "string",
+          "description": "ID of the reviewed product"
+        },
+        "orderId": {
+          "type": "string",
+          "description": "Associated order verification ID"
+        },
+        "userId": {
+          "type": "string",
+          "description": "UID of the user who wrote this review"
+        },
+        "rating": {
+          "type": "number",
+          "description": "Star rating out of 5"
+        },
+        "comment": {
+          "type": "string",
+          "description": "Review written text content"
+        },
+        "date": {
+          "type": "string",
+          "description": "Locale date string when submitted"
+        },
+        "userName": {
+          "type": "string",
+          "description": "Display name shown next to feedback"
+        }
+      },
+      "required": ["id", "productId", "orderId", "userId", "rating", "comment", "date", "userName"]
+    }
+  },
+  "firestore": {
+    "orders": {
+      "schema": "Order",
+      "description": "Collection of all customer purchase records"
+    },
+    "reviews": {
+      "schema": "ProductReview",
+      "description": "Collection of customer product review entries"
+    }
+  }
+}

@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useCartStore } from "../store/useCartStore";
 import { useOrderStore } from "../store/useOrderStore";
+import { useAuthStore } from "../store/useAuthStore";
 import { 
   X, MapPin, Truck, CreditCard, ShieldCheck, Check, 
   ArrowRight, ShoppingBag, ChevronRight, Lock, Printer, 
@@ -61,43 +62,79 @@ const DEFAULT_ADDRESS: ShippingAddress = {
   addressType: "home",
 };
 
+const EMPTY_ADDRESS: ShippingAddress = {
+  fullName: "",
+  phone: "",
+  email: "",
+  pinCode: "",
+  addressLine1: "",
+  addressLine2: "",
+  city: "",
+  state: "",
+  landmark: "",
+  addressType: "home",
+};
+
 export default function CheckoutFlow({ isOpen, onClose }: CheckoutFlowProps) {
   const { items, getTotalPrice, clearCart } = useCartStore();
   const { addOrder } = useOrderStore();
+  const { user } = useAuthStore();
   const totalPrice = getTotalPrice();
 
   const [step, setStep] = useState<CheckoutStep>("address");
-  const [address, setAddress] = useState<ShippingAddress>(DEFAULT_ADDRESS);
+  const [address, setAddress] = useState<ShippingAddress>(EMPTY_ADDRESS);
   const [shippingMethod, setShippingMethod] = useState<"standard" | "express" | "same-day">("standard");
   const [paymentMethod, setPaymentMethod] = useState<"razorpay" | "cod">("razorpay");
   const [loading, setLoading] = useState(false);
+  const [useSimulator, setUseSimulator] = useState(true);
   const [orderId, setOrderId] = useState<string>("");
   const [paymentId, setPaymentId] = useState<string>("");
   const [estimatedDelivery, setEstimatedDelivery] = useState<string>("");
 
   const [errors, setErrors] = useState<Partial<Record<keyof ShippingAddress, string>>>({});
 
+  // Automatically load logged in user's profile info when checkout opens
+  useEffect(() => {
+    if (isOpen) {
+      setAddress({
+        fullName: user?.displayName || "",
+        phone: "",
+        email: user?.email || "",
+        pinCode: "",
+        addressLine1: "",
+        addressLine2: "",
+        city: "",
+        state: "",
+        landmark: "",
+        addressType: "home",
+      });
+      setErrors({});
+    }
+  }, [isOpen, user]);
+
   // Pricing calculations
   const getShippingCost = () => {
-    if (shippingMethod === "express") return 150;
-    if (shippingMethod === "same-day") return 299;
-    return 0; // Standard is free
+    return 0; // Always free delivery
   };
 
   const getConvenienceFee = () => {
-    return paymentMethod === "cod" ? 50 : 0;
+    return 0; // No COD fee
   };
 
   const getTax = () => {
-    return Math.round(totalPrice * 0.18); // 18% GST standard e-commerce tax
+    return 0; // No tax added at checkout
   };
 
   const getGrandTotal = () => {
-    return totalPrice + getShippingCost() + getConvenienceFee() + getTax();
+    return totalPrice;
   };
 
   const prefillDemoAddress = () => {
-    setAddress(DEFAULT_ADDRESS);
+    setAddress({
+      ...DEFAULT_ADDRESS,
+      fullName: user?.displayName || DEFAULT_ADDRESS.fullName,
+      email: user?.email || DEFAULT_ADDRESS.email,
+    });
     setErrors({});
   };
 
@@ -147,6 +184,47 @@ export default function CheckoutFlow({ isOpen, onClose }: CheckoutFlowProps) {
 
     // Razorpay Flow
     if (paymentMethod === "razorpay") {
+      if (useSimulator) {
+        // Run simulated payment flow to prevent sandbox / iframe restrictions
+        setTimeout(() => {
+          const finalOrderId = `pay_sim_${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
+          const finalPaymentId = `pay_gate_sim_${Math.random().toString(36).substring(2, 12).toUpperCase()}`;
+
+          setOrderId(finalOrderId);
+          setPaymentId(finalPaymentId);
+          setStep("success");
+
+          // Save order to store
+          addOrder({
+            id: finalOrderId,
+            date: new Date().toISOString(),
+            items: [...items],
+            totalAmount: amount,
+            shippingAddress: {
+              fullName: address.fullName,
+              phone: address.phone,
+              email: address.email,
+              pinCode: address.pinCode,
+              addressLine1: address.addressLine1,
+              addressLine2: address.addressLine2,
+              city: address.city,
+              state: address.state,
+              landmark: address.landmark,
+              addressType: address.addressType,
+            },
+            shippingMethod,
+            paymentMethod,
+            status: "placed",
+            deliveryDate: formattedDeliveryDate,
+            paymentId: finalPaymentId,
+          }, user?.uid);
+
+          clearCart();
+          setLoading(false);
+        }, 1500);
+        return;
+      }
+
       try {
         const isScriptLoaded = await loadRazorpayScript();
         if (!isScriptLoaded) {
@@ -205,7 +283,7 @@ export default function CheckoutFlow({ isOpen, onClose }: CheckoutFlowProps) {
               status: "placed",
               deliveryDate: formattedDeliveryDate,
               paymentId: finalPaymentId,
-            });
+            }, user?.uid);
 
             clearCart();
           },
@@ -264,7 +342,7 @@ export default function CheckoutFlow({ isOpen, onClose }: CheckoutFlowProps) {
           status: "placed",
           deliveryDate: formattedDeliveryDate,
           paymentId: finalPaymentId,
-        });
+        }, user?.uid);
 
         clearCart();
         setLoading(false);
@@ -543,7 +621,7 @@ export default function CheckoutFlow({ isOpen, onClose }: CheckoutFlowProps) {
                           />
                           <div>
                             <p className="font-bold text-stone-900 text-sm flex items-center gap-2">
-                              Razorpay Secure Checkout <span className="text-[9px] font-mono font-bold bg-amber-100 border border-amber-300 text-amber-800 px-1.5 py-0.5 rounded uppercase">Highly Secure</span>
+                              Pay Online <span className="text-[9px] font-mono font-bold bg-emerald-100 border border-emerald-300 text-emerald-800 px-1.5 py-0.5 rounded uppercase">Highly Secure</span>
                             </p>
                             <p className="text-xs text-stone-500 mt-1">Pay smoothly using Credit Cards, Debit Cards, NetBanking, and UPI Wallets.</p>
                           </div>
@@ -566,12 +644,43 @@ export default function CheckoutFlow({ isOpen, onClose }: CheckoutFlowProps) {
                           />
                           <div>
                             <p className="font-bold text-stone-900 text-sm">Cash on Delivery (COD)</p>
-                            <p className="text-xs text-stone-500 mt-1">Pay with cash or scan-and-pay UPI QR on delivery. +₹50 handling charge applies.</p>
+                            <p className="text-xs text-stone-500 mt-1">Pay with cash or scan-and-pay UPI QR on delivery. No extra charge.</p>
                           </div>
                         </div>
-                        <span className="text-xs font-mono font-medium text-stone-500">+₹50 Fee</span>
+                        <span className="text-xs font-mono font-bold text-emerald-600">FREE</span>
                       </div>
                     </div>
+
+                    {/* Iframe sandbox warning and simulator info */}
+                    {paymentMethod === "razorpay" && (
+                      <div className="bg-amber-50/80 border border-amber-200/80 rounded-2xl p-5 space-y-3 shadow-xs">
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="flex items-center gap-2">
+                            <span className="relative flex h-2 w-2">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                              <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                            </span>
+                            <p className="text-[10px] font-mono font-bold text-amber-800 uppercase tracking-wider">AI Studio Sandbox Notice</p>
+                          </div>
+                          
+                          <label className="relative inline-flex items-center cursor-pointer select-none">
+                            <input 
+                              type="checkbox" 
+                              checked={useSimulator} 
+                              onChange={(e) => setUseSimulator(e.target.checked)} 
+                              className="sr-only peer"
+                            />
+                            <div className="w-8 h-4 bg-stone-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-emerald-600"></div>
+                            <span className="ml-2 text-[10px] font-mono font-bold text-stone-600 uppercase">Simulator</span>
+                          </label>
+                        </div>
+                        
+                        <p className="text-xs text-stone-700 leading-relaxed font-sans">
+                          Payment gateways (like Razorpay) naturally fail inside cross-origin sandboxed iframes. 
+                          We have pre-configured a <strong className="text-emerald-700">Payment Simulator</strong> so you can test successful order creation, status tracking, and the custom database invoice receipt seamlessly!
+                        </p>
+                      </div>
+                    )}
 
                     <div className="pt-6 border-t border-stone-200 flex justify-between">
                       <button
@@ -638,7 +747,7 @@ export default function CheckoutFlow({ isOpen, onClose }: CheckoutFlowProps) {
                             <button onClick={() => setStep("payment")} className="text-stone-500 hover:text-stone-900 hover:underline text-[10px] font-mono cursor-pointer">Edit</button>
                           </div>
                           <p className="text-xs text-stone-800 font-semibold uppercase font-mono">
-                            {paymentMethod === "razorpay" && "💳 Razorpay Gateway"}
+                            {paymentMethod === "razorpay" && "💳 Pay Online"}
                             {paymentMethod === "cod" && "💵 Cash on Delivery"}
                           </p>
                         </div>
@@ -668,32 +777,42 @@ export default function CheckoutFlow({ isOpen, onClose }: CheckoutFlowProps) {
                       </div>
                     </div>
 
-                    <div className="pt-6 border-t border-stone-200 flex justify-between items-center">
-                      <button
-                        onClick={() => setStep("payment")}
-                        className="px-4 py-2 text-stone-600 hover:text-stone-950 text-xs font-mono underline cursor-pointer"
-                      >
-                        ← Back to payment option
-                      </button>
-                      <button
-                        onClick={handlePlaceOrder}
-                        disabled={loading}
-                        className="px-8 py-3.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-stone-100 font-display font-extrabold text-sm transition-all active:scale-[0.98] cursor-pointer flex items-center gap-2 shadow-md disabled:opacity-50"
-                      >
-                        {loading ? (
-                          <>
-                            <svg className="animate-spin h-5 w-5 text-stone-100" fill="none" viewBox="0 0 24 24">
-                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                            </svg>
-                            Completing Order...
-                          </>
-                        ) : (
-                          <>
-                            Place Your Order — ₹{getGrandTotal().toLocaleString("en-IN")}
-                          </>
-                        )}
-                      </button>
+                    <div className="pt-6 border-t border-stone-200 flex flex-col items-end gap-2">
+                      <div className="w-full flex justify-between items-center">
+                        <button
+                          onClick={() => setStep("payment")}
+                          className="px-4 py-2 text-stone-600 hover:text-stone-950 text-xs font-mono underline cursor-pointer"
+                        >
+                          ← Back to payment option
+                        </button>
+                        <button
+                          onClick={handlePlaceOrder}
+                          disabled={loading}
+                          className="px-8 py-3.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-stone-100 font-display font-extrabold text-sm transition-all active:scale-[0.98] cursor-pointer flex items-center gap-2 shadow-md disabled:opacity-50"
+                        >
+                          {loading ? (
+                            <>
+                              <svg className="animate-spin h-5 w-5 text-stone-100" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                              </svg>
+                              Completing Order...
+                            </>
+                          ) : (
+                            <>
+                              Place Your Order — ₹{getGrandTotal().toLocaleString("en-IN")}
+                            </>
+                          )}
+                        </button>
+                      </div>
+                      {loading && (
+                        <button 
+                          onClick={() => setLoading(false)} 
+                          className="text-[11px] font-mono text-rose-500 hover:text-rose-700 underline cursor-pointer transition-colors"
+                        >
+                          Payment screen closed or didn't load? Click to Reset
+                        </button>
+                      )}
                     </div>
                   </motion.div>
                 )}
@@ -810,14 +929,9 @@ export default function CheckoutFlow({ isOpen, onClose }: CheckoutFlowProps) {
                     {paymentMethod === "cod" && (
                       <div className="flex justify-between">
                         <span>COD Convenience Fee:</span>
-                        <span className="font-mono text-stone-900">₹50</span>
+                        <span className="font-mono text-emerald-600 font-bold">FREE</span>
                       </div>
                     )}
-
-                    <div className="flex justify-between">
-                      <span>Est. GST Tax (18%):</span>
-                      <span className="font-mono text-stone-900">₹{getTax().toLocaleString("en-IN")}</span>
-                    </div>
 
                     <div className="border-t border-dashed border-stone-200 pt-3 flex justify-between font-bold text-stone-950 text-sm">
                       <span className="font-display">Grand Total:</span>

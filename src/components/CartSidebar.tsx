@@ -175,7 +175,7 @@ export default function CartSidebar({ isOpen, onClose, onCheckoutTrigger }: Cart
                 </button>
 
                 <p className="text-[10px] text-center text-stone-400 leading-normal">
-                  Payments are secure, encrypted, and processed instantly by Razorpay.
+                  Payments are secure, encrypted, and processed instantly.
                 </p>
               </div>
             )}

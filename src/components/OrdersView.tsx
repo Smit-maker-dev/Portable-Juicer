@@ -5,6 +5,7 @@
 
 import React, { useState } from "react";
 import { useOrderStore } from "../store/useOrderStore";
+import { useAuthStore } from "../store/useAuthStore";
 import { Order, ProductReview, Product } from "../types";
 import { 
   Package, Calendar, CheckCircle, Clock, Truck, ShieldAlert, 
@@ -20,6 +21,7 @@ interface OrdersViewProps {
 
 export default function OrdersView({ onBackToShop, onProductClick }: OrdersViewProps) {
   const { orders, reviews, addReview, updateOrderStatus } = useOrderStore();
+  const { user } = useAuthStore();
   const [activeTab, setActiveTab] = useState<"all" | "active" | "past">("all");
   const [selectedOrderDetails, setSelectedOrderDetails] = useState<string | null>(null);
   
@@ -31,7 +33,7 @@ export default function OrdersView({ onBackToShop, onProductClick }: OrdersViewP
   const [rating, setRating] = useState<number>(5);
   const [hoveredRating, setHoveredRating] = useState<number | null>(null);
   const [comment, setComment] = useState("");
-  const [userName, setUserName] = useState("Smit Vaghasiya");
+  const [userName, setUserName] = useState(user?.displayName || "Smit Vaghasiya");
   const [copiedOrderId, setCopiedOrderId] = useState<string | null>(null);
   const [isReviewSuccess, setIsReviewSuccess] = useState(false);
 
@@ -87,7 +89,7 @@ export default function OrdersView({ onBackToShop, onProductClick }: OrdersViewP
       userName: userName.trim() || "Verified Buyer"
     };
 
-    addReview(newReview);
+    addReview(newReview, user?.uid);
     setIsReviewSuccess(true);
     setTimeout(() => {
       setReviewingProduct(null);

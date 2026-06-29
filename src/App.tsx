@@ -7,6 +7,7 @@ import React, { useState, useEffect } from "react";
 import { useCartStore } from "./store/useCartStore";
 import CartSidebar from "./components/CartSidebar";
 import CheckoutFlow from "./components/CheckoutFlow";
+import LiveSalesNotification from "./components/LiveSalesNotification";
 import OrdersView from "./components/OrdersView";
 import AdminDashboard from "./components/AdminDashboard";
 import { Product } from "./types";
@@ -33,9 +34,11 @@ import {
 } from "lucide-react";
 import { gsap } from "gsap";
 import { useAuthStore } from "./store/useAuthStore";
+import { useOrderStore } from "./store/useOrderStore";
 import AuthModal from "./components/AuthModal";
 import AskExpertChat from "./components/AskExpertChat";
 import ScrollToTop from "./components/ScrollToTop";
+import PolicyModal, { PolicyTab } from "./components/PolicyModal";
 
 // Product definition matching types/index.ts
 const PREMIUM_BLENDER: Product = {
@@ -303,8 +306,23 @@ export default function App() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [pendingCheckout, setPendingCheckout] = useState(false);
   const [shareToast, setShareToast] = useState<string | null>(null);
+  const [policyOpen, setPolicyOpen] = useState(false);
+  const [policyInitialTab, setPolicyInitialTab] = useState<PolicyTab>("privacy");
 
   const { user, logout } = useAuthStore();
+  const { reviews, fetchReviews, fetchOrders, syncLocalToFirestore } = useOrderStore();
+
+  // Load product reviews and user-specific orders from Firestore
+  useEffect(() => {
+    fetchReviews();
+  }, [fetchReviews]);
+
+  useEffect(() => {
+    if (user) {
+      fetchOrders(user.uid);
+      syncLocalToFirestore(user.uid);
+    }
+  }, [user, fetchOrders, syncLocalToFirestore]);
 
   // Check URL search params for deep linking to products, and route check for secret admin path
   useEffect(() => {
@@ -1168,41 +1186,24 @@ export default function App() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            
-            <div className="p-6 rounded-2xl border border-stone-200 bg-stone-50/40 space-y-4">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h4 className="font-display font-semibold text-stone-900 text-sm">Aditya R.</h4>
-                  <p className="text-[10px] text-stone-400 font-mono">Verified Buyer • Mumbai</p>
+            {reviews.map((review) => (
+              <div key={review.id} className="p-6 rounded-2xl border border-stone-200 bg-stone-50/40 space-y-4 hover:border-stone-400 transition-all duration-300 shadow-3xs">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h4 className="font-display font-semibold text-stone-900 text-sm">{review.userName}</h4>
+                    <p className="text-[10px] text-stone-400 font-mono">Verified Buyer • {review.date}</p>
+                  </div>
+                  <div className="flex gap-0.5">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className={`h-3 w-3 ${i < review.rating ? "fill-amber-400 text-amber-400" : "text-stone-200"}`} />
+                    ))}
+                  </div>
                 </div>
-                <div className="flex gap-0.5">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-3 w-3 fill-amber-400 text-amber-400" />
-                  ))}
-                </div>
+                <p className="text-stone-600 text-xs sm:text-sm leading-relaxed font-sans">
+                  "{review.comment}"
+                </p>
               </div>
-              <p className="text-stone-600 text-xs sm:text-sm leading-relaxed">
-                "Honestly surprised at the motor's crushing capability. It easily powderizes frozen blueberries. I use it at my desk in the office to whip up an afternoon protein smoothie without any noisy distraction. Charges with my laptop charger!"
-              </p>
-            </div>
-
-            <div className="p-6 rounded-2xl border border-stone-200 bg-stone-50/40 space-y-4">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h4 className="font-display font-semibold text-stone-900 text-sm">Priya M.</h4>
-                  <p className="text-[10px] text-stone-400 font-mono">Verified Buyer • Bangalore</p>
-                </div>
-                <div className="flex gap-0.5">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-3 w-3 fill-amber-400 text-amber-400" />
-                  ))}
-                </div>
-              </div>
-              <p className="text-stone-600 text-xs sm:text-sm leading-relaxed">
-                "The safety alignment light is really great. The motor refuses to start if I haven't fully tightened the cup, which is amazing for keeping things mess-free. The Sage color matches my athletic bag perfectly."
-              </p>
-            </div>
-
+            ))}
           </div>
 
         </div>
@@ -1287,9 +1288,35 @@ export default function App() {
             <span className="text-stone-300">|</span>
             <span>Est. 2026</span>
           </div>
-          <div className="flex gap-6">
-            <a href="#features-grid" className="hover:text-stone-600">Tech specs</a>
-            <a href="#customer-testimonials" className="hover:text-stone-600">Reviews</a>
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
+            <button 
+              id="footer-link-privacy"
+              onClick={() => { setPolicyInitialTab("privacy"); setPolicyOpen(true); }} 
+              className="hover:text-stone-600 transition-colors cursor-pointer"
+            >
+              Privacy Policy
+            </button>
+            <button 
+              id="footer-link-terms"
+              onClick={() => { setPolicyInitialTab("terms"); setPolicyOpen(true); }} 
+              className="hover:text-stone-600 transition-colors cursor-pointer"
+            >
+              Terms & Conditions
+            </button>
+            <button 
+              id="footer-link-refund"
+              onClick={() => { setPolicyInitialTab("refund"); setPolicyOpen(true); }} 
+              className="hover:text-stone-600 transition-colors cursor-pointer"
+            >
+              Cancellation & Refund
+            </button>
+            <button 
+              id="footer-link-shipping"
+              onClick={() => { setPolicyInitialTab("shipping"); setPolicyOpen(true); }} 
+              className="hover:text-stone-600 transition-colors cursor-pointer"
+            >
+              Shipping Policy
+            </button>
           </div>
           <p className="text-stone-400 font-mono text-[10px]">
             © {new Date().getFullYear()} KuaxiBlend Co. All rights reserved. Powered securely by Razorpay.
@@ -1314,6 +1341,16 @@ export default function App() {
 
       {/* Checkout Flow Overlay */}
       <CheckoutFlow isOpen={checkoutOpen} onClose={() => setCheckoutOpen(false)} />
+
+      {/* Live Sales Notification (Social Proof / FOMO popups) */}
+      <LiveSalesNotification />
+
+      {/* Legal & Policies Modal Overlay */}
+      <PolicyModal 
+        isOpen={policyOpen} 
+        onClose={() => setPolicyOpen(false)} 
+        initialTab={policyInitialTab} 
+      />
 
       {/* Authentication Modal */}
       <AuthModal 
@@ -1496,6 +1533,35 @@ export default function App() {
                       </li>
                     ))}
                   </ul>
+                </div>
+
+                {/* Real-time Customer Reviews on this Product */}
+                <div className="space-y-3 pt-4 border-t border-stone-200">
+                  <h4 className="font-display font-bold text-stone-950 text-sm">Customer Feedback:</h4>
+                  {(() => {
+                    const productReviews = reviews.filter(r => r.productId === selectedProductForModal.id);
+                    if (productReviews.length === 0) {
+                      return <p className="text-xs text-stone-500 italic">No reviews yet for this model. Be the first to buy and review!</p>;
+                    }
+                    return (
+                      <div className="space-y-3 max-h-[220px] overflow-y-auto pr-2 scrollbar-thin">
+                        {productReviews.map((rev) => (
+                          <div key={rev.id} className="bg-stone-100/50 rounded-xl p-3 border border-stone-200/40 space-y-1.5 shadow-4xs">
+                            <div className="flex justify-between items-center">
+                              <span className="text-xs font-semibold text-stone-800">{rev.userName}</span>
+                              <div className="flex">
+                                {[...Array(5)].map((_, i) => (
+                                  <Star key={i} className={`h-3 w-3 ${i < rev.rating ? "fill-amber-400 text-amber-400" : "text-stone-200"}`} />
+                                ))}
+                              </div>
+                            </div>
+                            <p className="text-[11px] text-stone-600 leading-normal">"{rev.comment}"</p>
+                            <span className="text-[9px] text-stone-400 font-mono block text-right">{rev.date}</span>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
 
