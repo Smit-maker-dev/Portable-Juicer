@@ -33,7 +33,7 @@ export default function OrdersView({ onBackToShop, onProductClick }: OrdersViewP
   const [rating, setRating] = useState<number>(5);
   const [hoveredRating, setHoveredRating] = useState<number | null>(null);
   const [comment, setComment] = useState("");
-  const [userName, setUserName] = useState(user?.displayName || "Smit Vaghasiya");
+  const [userName, setUserName] = useState(user?.displayName || "Aarav Sharma");
   const [copiedOrderId, setCopiedOrderId] = useState<string | null>(null);
   const [isReviewSuccess, setIsReviewSuccess] = useState(false);
 
@@ -604,7 +604,7 @@ export default function OrdersView({ onBackToShop, onProductClick }: OrdersViewP
                       value={userName}
                       onChange={(e) => setUserName(e.target.value)}
                       required
-                      placeholder="e.g. Smit V"
+                      placeholder="e.g. Aarav S"
                       className="w-full text-xs py-2 px-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:border-stone-400"
                     />
                   </div>

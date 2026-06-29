@@ -78,15 +78,15 @@ const DEFAULT_ORDERS: Order[] = [
     ],
     totalAmount: 499,
     shippingAddress: {
-      fullName: "Smit Vaghasiya",
-      phone: "9988776655",
-      email: "smitvaghasiya182@gmail.com",
-      pinCode: "395006",
-      addressLine1: "B-404, Shrinand Residency, VIP Road",
-      addressLine2: "Near Vesu Canal Road",
-      city: "Surat",
-      state: "Gujarat",
-      landmark: "Opposite Royal Arcade",
+      fullName: "Aarav Sharma",
+      phone: "9876543210",
+      email: "aarav.sharma@example.com",
+      pinCode: "110070",
+      addressLine1: "A-101, Block C, Shanti Kunj",
+      addressLine2: "Vasant Kunj",
+      city: "New Delhi",
+      state: "Delhi",
+      landmark: "Near Vasant Square Mall",
       addressType: "home"
     },
     shippingMethod: "standard",
@@ -115,15 +115,15 @@ const DEFAULT_ORDERS: Order[] = [
     ],
     totalAmount: 888,
     shippingAddress: {
-      fullName: "Smit Vaghasiya",
-      phone: "9988776655",
-      email: "smitvaghasiya182@gmail.com",
-      pinCode: "395006",
-      addressLine1: "B-404, Shrinand Residency, VIP Road",
-      addressLine2: "Near Vesu Canal Road",
-      city: "Surat",
-      state: "Gujarat",
-      landmark: "Opposite Royal Arcade",
+      fullName: "Aarav Sharma",
+      phone: "9876543210",
+      email: "aarav.sharma@example.com",
+      pinCode: "110070",
+      addressLine1: "A-101, Block C, Shanti Kunj",
+      addressLine2: "Vasant Kunj",
+      city: "New Delhi",
+      state: "Delhi",
+      landmark: "Near Vasant Square Mall",
       addressType: "home"
     },
     shippingMethod: "express",
@@ -147,7 +147,7 @@ const DEFAULT_REVIEWS: ProductReview[] = [
     rating: 5,
     comment: "Absolutely in love with this portable blender! Cleans so easily and the real-life look is pure premium. Smoothies come out completely seedless and silky. Highly recommend!",
     date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toLocaleDateString("en-IN"),
-    userName: "Smit Vaghasiya"
+    userName: "Aarav Sharma"
   }
 ];
 

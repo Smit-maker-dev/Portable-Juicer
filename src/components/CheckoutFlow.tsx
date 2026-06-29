@@ -50,15 +50,15 @@ interface ShippingAddress {
 }
 
 const DEFAULT_ADDRESS: ShippingAddress = {
-  fullName: "Smit Vaghasiya",
-  phone: "9988776655",
-  email: "smitvaghasiya182@gmail.com",
-  pinCode: "395006",
-  addressLine1: "B-404, Shrinand Residency, VIP Road",
-  addressLine2: "Near Vesu Canal Road",
-  city: "Surat",
-  state: "Gujarat",
-  landmark: "Opposite Royal Arcade",
+  fullName: "Aarav Sharma",
+  phone: "9876543210",
+  email: "aarav.sharma@example.com",
+  pinCode: "110070",
+  addressLine1: "A-101, Block C, Shanti Kunj",
+  addressLine2: "Vasant Kunj",
+  city: "New Delhi",
+  state: "Delhi",
+  landmark: "Near Vasant Square Mall",
   addressType: "home",
 };
 
@@ -447,7 +447,7 @@ export default function CheckoutFlow({ isOpen, onClose }: CheckoutFlowProps) {
                           value={address.fullName}
                           onChange={(e) => setAddress({ ...address, fullName: e.target.value })}
                           className={`w-full bg-white border ${errors.fullName ? "border-red-400" : "border-stone-200"} rounded-xl p-3 text-sm focus:outline-hidden focus:ring-1 focus:ring-stone-400 font-sans`}
-                          placeholder="e.g. Smit Vaghasiya"
+                          placeholder="e.g. Aarav Sharma"
                         />
                         {errors.fullName && <p className="text-[10px] text-red-500 font-mono flex items-center gap-1"><AlertCircle className="h-3 w-3" /> {errors.fullName}</p>}
                       </div>
@@ -460,7 +460,7 @@ export default function CheckoutFlow({ isOpen, onClose }: CheckoutFlowProps) {
                           value={address.phone}
                           onChange={(e) => setAddress({ ...address, phone: e.target.value })}
                           className={`w-full bg-white border ${errors.phone ? "border-red-400" : "border-stone-200"} rounded-xl p-3 text-sm focus:outline-hidden focus:ring-1 focus:ring-stone-400 font-mono`}
-                          placeholder="9988776655"
+                          placeholder="9876543210"
                         />
                         {errors.phone && <p className="text-[10px] text-red-500 font-mono flex items-center gap-1"><AlertCircle className="h-3 w-3" /> {errors.phone}</p>}
                       </div>
@@ -473,7 +473,7 @@ export default function CheckoutFlow({ isOpen, onClose }: CheckoutFlowProps) {
                           value={address.email}
                           onChange={(e) => setAddress({ ...address, email: e.target.value })}
                           className={`w-full bg-white border ${errors.email ? "border-red-400" : "border-stone-200"} rounded-xl p-3 text-sm focus:outline-hidden focus:ring-1 focus:ring-stone-400 font-sans`}
-                          placeholder="smitvaghasiya182@gmail.com"
+                          placeholder="aarav.sharma@example.com"
                         />
                         {errors.email && <p className="text-[10px] text-red-500 font-mono flex items-center gap-1"><AlertCircle className="h-3 w-3" /> {errors.email}</p>}
                       </div>
@@ -486,7 +486,7 @@ export default function CheckoutFlow({ isOpen, onClose }: CheckoutFlowProps) {
                           value={address.addressLine1}
                           onChange={(e) => setAddress({ ...address, addressLine1: e.target.value })}
                           className={`w-full bg-white border ${errors.addressLine1 ? "border-red-400" : "border-stone-200"} rounded-xl p-3 text-sm focus:outline-hidden focus:ring-1 focus:ring-stone-400 font-sans`}
-                          placeholder="e.g. B-404, Shrinand Residency"
+                          placeholder="e.g. A-101, Shanti Kunj"
                         />
                         {errors.addressLine1 && <p className="text-[10px] text-red-500 font-mono flex items-center gap-1"><AlertCircle className="h-3 w-3" /> {errors.addressLine1}</p>}
                       </div>
@@ -499,7 +499,7 @@ export default function CheckoutFlow({ isOpen, onClose }: CheckoutFlowProps) {
                           value={address.addressLine2}
                           onChange={(e) => setAddress({ ...address, addressLine2: e.target.value })}
                           className="w-full bg-white border border-stone-200 rounded-xl p-3 text-sm focus:outline-hidden focus:ring-1 focus:ring-stone-400 font-sans"
-                          placeholder="e.g. VIP Road, Vesu"
+                          placeholder="e.g. Vasant Kunj"
                         />
                       </div>
 
@@ -511,7 +511,7 @@ export default function CheckoutFlow({ isOpen, onClose }: CheckoutFlowProps) {
                           value={address.pinCode}
                           onChange={(e) => setAddress({ ...address, pinCode: e.target.value })}
                           className={`w-full bg-white border ${errors.pinCode ? "border-red-400" : "border-stone-200"} rounded-xl p-3 text-sm focus:outline-hidden focus:ring-1 focus:ring-stone-400 font-mono`}
-                          placeholder="395007"
+                          placeholder="110070"
                         />
                         {errors.pinCode && <p className="text-[10px] text-red-500 font-mono flex items-center gap-1"><AlertCircle className="h-3 w-3" /> {errors.pinCode}</p>}
                       </div>

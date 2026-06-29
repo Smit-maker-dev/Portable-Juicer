@@ -79,9 +79,9 @@ export default function CheckoutButton({ amount, className = "", onSuccess }: Ch
           }
         },
         prefill: {
-          name: "Smit Vaghasiya",
-          email: "smitvaghasiya182@gmail.com",
-          contact: "9999999999",
+          name: "Aarav Sharma",
+          email: "aarav.sharma@example.com",
+          contact: "9876543210",
         },
         theme: {
           color: "#78716C", // Charcoal grey to fit the light papery theme

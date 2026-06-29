@@ -194,7 +194,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                     <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
                     <input
                       type="text"
-                      placeholder="Smit Vaghasiya"
+                      placeholder="Aarav Sharma"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       disabled={isSubmitting}
