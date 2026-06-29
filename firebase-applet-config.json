@@ -1,10 +1,10 @@
 {
-  "projectId": "master-hawk-bwjkk",
-  "appId": "1:930521541557:web:72e0692b1b2b38116847fc",
-  "apiKey": "AIzaSyBpsFk247i_rdx56xuWaku3fczFy0xjrPw",
-  "authDomain": "master-hawk-bwjkk.firebaseapp.com",
+  "projectId": "kuaxi-blend",
+  "appId": "1:578546296781:web:e5e014f08e05d680c78684",
+  "apiKey": "AIzaSyAUuEG9-UeIJpxbuu86-ZurCn_lJRQZ1Ro",
+  "authDomain": "kuaxi-blend.firebaseapp.com",
   "firestoreDatabaseId": "ai-studio-portableblenders-7c622bc0-462a-4435-8b4c-b9b125ab0de8",
-  "storageBucket": "master-hawk-bwjkk.firebasestorage.app",
-  "messagingSenderId": "930521541557",
+  "storageBucket": "kuaxi-blend.firebasestorage.app",
+  "messagingSenderId": "578546296781",
   "measurementId": ""
 }
