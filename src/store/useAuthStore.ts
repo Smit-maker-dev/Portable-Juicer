@@ -60,11 +60,15 @@ export const useAuthStore = create<AuthState>((set) => ({
       let friendlyMessage = "Failed to log in with Google";
       
       if (err.code === "auth/unauthorized-domain") {
-        friendlyMessage = "This domain is not authorized for Google Sign-in. Please add your Vercel URL to Authorized Domains in the Firebase Console.";
+        friendlyMessage = "Unauthorized Domain: Please add this URL to 'Authorized Domains' in your Firebase Console.";
       } else if (err.code === "auth/popup-blocked") {
-        friendlyMessage = "The sign-in popup was blocked by your browser. Please allow popups for this site.";
+        friendlyMessage = "Popup Blocked: Please allow popups for this site to sign in with Google.";
       } else if (err.code === "auth/cancelled-popup-request") {
         friendlyMessage = "Sign-in was cancelled. Please try again.";
+      } else if (err.code === "auth/popup-closed-by-user") {
+        friendlyMessage = "The sign-in popup was closed before completion.";
+      } else if (err.message) {
+        friendlyMessage = err.message;
       }
       
       set({ error: friendlyMessage, loading: false });
@@ -87,10 +91,23 @@ export const useAuthStore = create<AuthState>((set) => ({
         loading: false,
       });
     } catch (err: any) {
-      // Secure logging: Log internally but do NOT propagate detailed information to the state or UI
-      console.warn("Authentication failure detected and scrubbed for security");
-      set({ error: "Incorrect email or password", loading: false });
-      throw new Error("Incorrect email or password");
+      console.error("Authentication error:", err);
+      let friendlyMessage = "Incorrect email or password";
+      
+      if (err.code === "auth/invalid-email") {
+        friendlyMessage = "The email address is invalid.";
+      } else if (err.code === "auth/user-disabled") {
+        friendlyMessage = "This user account has been disabled.";
+      } else if (err.code === "auth/user-not-found" || err.code === "auth/wrong-password" || err.code === "auth/invalid-credential") {
+        friendlyMessage = "Incorrect email or password";
+      } else if (err.code === "auth/too-many-requests") {
+        friendlyMessage = "Too many failed attempts. Please try again later.";
+      } else if (err.message) {
+        friendlyMessage = err.message;
+      }
+      
+      set({ error: friendlyMessage, loading: false });
+      throw err;
     }
   },
 
@@ -110,10 +127,23 @@ export const useAuthStore = create<AuthState>((set) => ({
         loading: false,
       });
     } catch (err: any) {
-      // Secure logging: Log internally but do NOT propagate detailed user existence information
-      console.warn("Registration failure detected and scrubbed for security");
-      set({ error: "An error occurred during registration. Please try again.", loading: false });
-      throw new Error("An error occurred during registration. Please try again.");
+      console.error("Registration error:", err);
+      let friendlyMessage = "An error occurred during registration. Please try again.";
+      
+      if (err.code === "auth/email-already-in-use") {
+        friendlyMessage = "This email address is already registered.";
+      } else if (err.code === "auth/weak-password") {
+        friendlyMessage = "The password is too weak. Please use at least 6 characters.";
+      } else if (err.code === "auth/invalid-email") {
+        friendlyMessage = "The email address is invalid.";
+      } else if (err.code === "auth/operation-not-allowed") {
+        friendlyMessage = "Email/password accounts are not enabled. Please contact support.";
+      } else if (err.message) {
+        friendlyMessage = err.message;
+      }
+      
+      set({ error: friendlyMessage, loading: false });
+      throw err;
     }
   },
 

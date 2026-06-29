@@ -34,14 +34,13 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
   };
 
   const validatePasswordFormat = (val: string): boolean => {
-    // Password must be between 8 and 128 characters
-    return val.length >= 8 && val.length <= 128;
+    // Password must be between 6 and 128 characters (Firebase default min is 6)
+    return val.length >= 6 && val.length <= 128;
   };
 
   const validateNameFormat = (val: string): boolean => {
-    // Only allow letters, spaces, and clean punctuation, length 2-50
-    const nameRegex = /^[a-zA-Z\s.\-']+$/;
-    return nameRegex.test(val) && val.length >= 2 && val.length <= 50;
+    // Be more permissive with names, just check length and basic trim
+    return val.trim().length >= 2 && val.trim().length <= 100;
   };
 
   if (!isOpen) return null;
@@ -87,14 +86,12 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     const isNameValid = !isSignUp || validateNameFormat(sanitizedName);
 
     if (!isEmailValid || !isPasswordValid || !isNameValid) {
-      // Secure logging: alert backend/logs of a potential automated payload or bad input
-      console.warn("Security Alert: Invalid input formats detected during form submission.");
-      
-      // Generic error message: do not reveal which field failed rule to user (Standard 2 & 4)
-      if (isSignUp) {
-        setLocalError("An error occurred during registration. Please check your inputs.");
-      } else {
-        setLocalError("Incorrect email or password");
+      if (!isEmailValid) {
+        setLocalError("Please enter a valid email address.");
+      } else if (!isPasswordValid) {
+        setLocalError("Password must be at least 6 characters long.");
+      } else if (!isNameValid) {
+        setLocalError("Please enter a valid name (2-100 characters).");
       }
       return;
     }
@@ -109,12 +106,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       if (onSuccess) onSuccess();
       onClose();
     } catch (err: any) {
-      // Return a completely generic error message to avoid state leakage (Standard 4)
-      if (isSignUp) {
-        setLocalError("An error occurred during registration. Please try again.");
-      } else {
-        setLocalError("Incorrect email or password");
-      }
+      setLocalError(err.message || (isSignUp ? "An error occurred during registration." : "Incorrect email or password"));
     } finally {
       setIsSubmitting(false);
     }
