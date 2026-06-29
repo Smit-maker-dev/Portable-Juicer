@@ -1,6 +1,6 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { initializeFirestore } from "firebase/firestore";
 import firebaseConfigJson from "../../firebase-applet-config.json";
 
 // Safely cast the configuration JSON to handle alternate schemas (e.g., service accounts or custom formats)
@@ -24,7 +24,12 @@ const app = getApps().length === 0 ? initializeApp(config) : getApp();
 
 export const auth = getAuth(app);
 const dbId = import.meta.env.VITE_FIREBASE_DATABASE_ID || fbJson.firestoreDatabaseId || fbJson.firestore_database_id || "ai-studio-portableblenders-7c622bc0-462a-4435-8b4c-b9b125ab0de8";
-export const db = dbId ? getFirestore(app, dbId) : getFirestore(app);
+
+// Initialize Firestore with force long polling enabled to handle network/proxy issues in iframe/Vercel environments seamlessly
+export const db = initializeFirestore(app, {
+  experimentalForceLongPolling: true,
+}, dbId);
+
 export const googleProvider = new GoogleAuthProvider();
 
 // Standard scopes
